@@ -72,15 +72,16 @@ const adminController = {
                                 if (err) {
                                     return next(err);
                                 }
-
-                                return res.status(200).json({
-                                    "error": false,
-                                    "message": "User successfully logged in",
-                                    "data": {
-                                        "accessToken": accessToken,
-                                        "refreshToken": refreshToken
-                                    }
-                                })
+                                else{
+                                    return res.status(200).json({
+                                        "error": false,
+                                        "message": "User successfully logged in",
+                                        "data": {
+                                            "accessToken": accessToken,
+                                            "refreshToken": refreshToken
+                                        }
+                                    })
+                                }
                             });
                         }
                         else {

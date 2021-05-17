@@ -25,7 +25,7 @@ const studentController = {
                 if (err) {
                     return next(err);
                 }
-                else if (!doc || doc.length == 0) {
+                else if (!doc || doc.length <= 0) {
                     return res.status(404).json({
                         "error": true,
                         "message": "Incorrect login credentials",
@@ -33,37 +33,74 @@ const studentController = {
                     });
                 }
                 else {
-                    bcrypt.compare(req.body.password, doc.accessCode, (err, result) => {
+                    bcrypt.compare(req.body.password, doc.access_code, (err, result) => {
                         if (err) {
                             return next(err);
                         }
                         else if (result == true) {
-                            const accessToken = jwt.sign({
-                                "role": "student",
-                                "id": doc.studentID
-                            }, process.env.ACCESS_TOKEN, { expiresIn: "7d" });
-                            doc.accessCode = undefined;
+                            var student = doc;
 
-                            
+                            try {
+                                //creating access token
+                                var accessToken = jwt.sign({
+                                    "role": "student",
+                                    "id": doc.student_id
+                                }, process.env.ACCESS_TOKEN, { expiresIn: "15m" });
 
-                            return res.status(200).json({
-                                "error": false,
-                                "message": "User successfully logged in",
-                                "data": {
-                                    "token": accessToken,
-                                    "user": doc
+                                //generate unique uuid for refresh token
+                                var tokenId = uuidv4().replace(/-/g, '');
+
+                                //creating refresh token
+                                var refreshToken = jwt.sign({
+                                    "role": "student",
+                                    "id": doc.student_id
+                                }, process.env.REFRESH_TOKEN, { expiresIn: "7d", jwtid: tokenId });
+                            } catch (error) {
+                                return next(error);
+                            }
+
+                            const decodedToken = jwt.decode(refreshToken);
+
+                            //creating object based on refresh token
+                            const newToken = new TokenModel({
+                                jti: decodedToken.jti,
+                                iat: decodedToken.iat,
+                                exp: decodedToken.exp
+                            });
+
+                            //saving token object to database
+                            newToken.save((err, doc) => {
+                                if (err) {
+                                    return next(err);
                                 }
-                            })
+                                else{
+                                    //removing password from retrieved driver object
+                                    student.access_code = undefined;
+
+                                    return res.status(200).json({
+                                        "error": false,
+                                        "message": "User successfully logged in",
+                                        "data": {
+                                            "accessToken": accessToken,
+                                            "refreshToken": refreshToken,
+                                            "user": student
+                                        }
+                                    })
+                                }
+                            });
                         }
-                        return res.status(404).json({
-                            "error": true,
-                            "message": "Incorrect login credentials",
-                            "data": null
-                        });
+                        else {
+                            return res.status(404).json({
+                                "error": true,
+                                "message": "Incorrect login credentials",
+                                "data": null
+                            });
+                        }
                     });
                 }
             });
         }
+    ,
 }
 
 module.exports = studentController;

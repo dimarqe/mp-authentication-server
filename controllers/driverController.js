@@ -35,62 +35,69 @@ const driverController = {
                     });
                 }
                 else {
-                    bcrypt.compare(req.body.password, doc.accessCode, (err, result) => {
+                    bcrypt.compare(req.body.password, doc.access_code, (err, result) => {
                         if (err) {
                             return next(err);
                         }
                         else if (result == true) {
-                            //creating access token
-                            const accessToken = jwt.sign({
-                                "role": "driver",
-                                "id": doc.driverID
-                            }, process.env.ACCESS_TOKEN, { expiresIn: "15m" });
+                            var driver = doc;
+                        
+                            try {
+                                //creating access token
+                                var accessToken = jwt.sign({
+                                    "role": "driver",
+                                    "id": doc.driver_id
+                                }, process.env.ACCESS_TOKEN, { expiresIn: "15m" });
 
-                            //generate unique uuid for refresh token
-                            let tokenId = uuidv4();
-                            tokenId.replaceAll('-','');
+                                //generate unique uuid for refresh token
+                                let tokenId = uuidv4().replace(/-/g, '');
 
-                            //creating refresh token
-                            const refreshToken = jwt.sign({
-                                "role": "driver",
-                                "id": doc.driverID
-                            }, process.env.REFRESH_TOKEN, { expiresIn: "7d", jwtid : tokenId});
+                                //creating refresh token
+                                var refreshToken = jwt.sign({
+                                    "role": "driver",
+                                    "id": doc.driver_id
+                                }, process.env.REFRESH_TOKEN, { expiresIn: "7d", jwtid: tokenId });
+                            } catch (error) {
+                                return next(error);
+                            }
 
                             const decodedToken = jwt.decode(refreshToken);
 
                             //creating object based on refresh token
                             const newToken = new TokenModel({
-                                jti: tokenId,
+                                jti: decodedToken.jti,
                                 iat: decodedToken.iat,
                                 exp: decodedToken.exp
                             });
-            
+
                             //saving token object to database
                             newToken.save((err, doc) => {
                                 if (err) {
                                     return next(err);
                                 }
-                            });
+                                else {
+                                    //removing password from retrieved driver object
+                                    driver.access_code = undefined;
 
-                            //removing password from retrieved driver object
-                            doc.accessCode = undefined;
-
-                            return res.status(200).json({
-                                "error": false,
-                                "message": "User successfully logged in",
-                                "data": {
-                                    "accessToken": accessToken,
-                                    "refreshToken":refreshToken,
-                                    "user": doc
+                                    return res.status(200).json({
+                                        "error": false,
+                                        "message": "User successfully logged in",
+                                        "data": {
+                                            "accessToken": accessToken,
+                                            "refreshToken": refreshToken,
+                                            "user": driver
+                                        }
+                                    })
                                 }
-                            })
+                            });
                         }
-
-                        return res.status(404).json({
-                            "error": true,
-                            "message": "Incorrect login credentials",
-                            "data": null
-                        });
+                        else {
+                            return res.status(404).json({
+                                "error": true,
+                                "message": "Incorrect login credentials",
+                                "data": null
+                            });
+                        }
                     });
                 }
             });
