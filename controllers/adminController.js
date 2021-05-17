@@ -53,7 +53,7 @@ const adminController = {
                                 var refreshToken = jwt.sign({
                                     "role": "admin",
                                     "id": doc.admin_id
-                                }, process.env.REFRESH_TOKEN, { expiresIn: "7d", jwtid: tokenId });
+                                }, process.env.REFRESH_TOKEN, { expiresIn: "3d", jwtid: tokenId });
                             } catch (error) {
                                 return next(error);
                             }
