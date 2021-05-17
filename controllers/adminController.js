@@ -26,7 +26,7 @@ const adminController = {
                 if (err) {
                     return next(err);
                 }
-                else if (!doc || doc.length == 0) {
+                else if (!doc || doc.length <= 0) {
                     return res.status(404).json({
                         "error": true,
                         "message": "Incorrect login credentials",
@@ -51,8 +51,8 @@ const adminController = {
 
                                 //creating refresh token
                                 var refreshToken = jwt.sign({
-                                    "role": "driver",
-                                    "id": doc.driverID
+                                    "role": "admin",
+                                    "id": doc.admin_id
                                 }, process.env.REFRESH_TOKEN, { expiresIn: "7d", jwtid: tokenId });
                             } catch (error) {
                                 return next(error);
@@ -62,7 +62,7 @@ const adminController = {
 
                             //creating object based on refresh token
                             const newToken = new TokenModel({
-                                jti: tokenId,
+                                jti: decodedToken.jti,
                                 iat: decodedToken.iat,
                                 exp: decodedToken.exp
                             });
@@ -77,13 +77,13 @@ const adminController = {
                                     "error": false,
                                     "message": "User successfully logged in",
                                     "data": {
-                                        "token": accessToken,
+                                        "accessToken": accessToken,
                                         "refreshToken": refreshToken
                                     }
                                 })
                             });
                         }
-                        else{
+                        else {
                             return res.status(404).json({
                                 "error": true,
                                 "message": "Incorrect login credentials",
@@ -95,10 +95,6 @@ const adminController = {
             });
         }
     ,
-    logout:
-        async(req, res, next)=>{
-            
-        }
 }
 
 

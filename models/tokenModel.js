@@ -18,19 +18,19 @@ class Token {
         });
     }
 
-    static findByID(studentID, result){
-        pool.query("select * from student where student_id = ? limit 1", studentID, (err, doc)=>{
+    static findById(jti, result){
+        pool.query("select * from token where jti = unhex(?) limit 1", jti, (err, doc) => {
             if (err) {
                 result(err, null);
             }
             else {
-                result(null, doc[0]);
+                result(null, doc);
             }
         });
     }
 
-    static delete(driverID, result){
-        pool.query("delete from driver where driver_id = ? limit 1", driverID, (err, doc) => {
+    static delete(jti, result){
+        pool.query("delete from token where jti = unhex(?) limit 1", jti, (err, doc) => {
             if (err) {
                 result(err, null);
             }

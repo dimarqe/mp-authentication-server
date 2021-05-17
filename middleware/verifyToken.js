@@ -13,16 +13,16 @@ module.exports = (req, res, next)=>{
 
     const token = authHeader.split(' ')[1];
 
-    jwt.verify(token, process.env.ACCESS_TOKEN, (err, user)=>{
+    jwt.verify(token, process.env.REFRESH_TOKEN, (err, payload)=>{
         if(err){
             return res.status(403).json({
                 "error": true,
-                "message": "Invalid access token",
+                "message": "Invalid refresh token",
                 "data": null
             });
         }
 
-        req.user = user;
+        req.user = payload;
         next();
     });
 }

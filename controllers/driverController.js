@@ -79,7 +79,7 @@ const driverController = {
                                 "error": false,
                                 "message": "User successfully logged in",
                                 "data": {
-                                    "token": accessToken,
+                                    "accessToken": accessToken,
                                     "refreshToken":refreshToken,
                                     "user": doc
                                 }
