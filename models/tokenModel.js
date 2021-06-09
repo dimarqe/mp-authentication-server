@@ -7,8 +7,8 @@ class Token {
         this.exp = token.exp;
     }
 
-    save(result){
-        pool.query("insert into token values (unhex(?),?,?)", [this.jti, this.iat, this.exp], (err, doc) => {
+    static save(token, result){
+        pool.query("insert into refresh_token (jti, iat, expiration) values ($1, $2, $3)", [token.jti, token.iat, token.exp], (err, doc) => {
             if (err) {
                 result(err, null);
             }
@@ -19,18 +19,18 @@ class Token {
     }
 
     static findById(jti, result){
-        pool.query("select * from token where jti = unhex(?) limit 1", jti, (err, doc) => {
+        pool.query("select * from refresh_token where jti = $1", [jti], (err, doc) => {
             if (err) {
                 result(err, null);
             }
             else {
-                result(null, doc);
+                result(null, doc.rows[0]);
             }
         });
     }
 
     static delete(jti, result){
-        pool.query("delete from token where jti = unhex(?) limit 1", jti, (err, doc) => {
+        pool.query("delete from refresh_token where jti = $1", [jti], (err, doc) => {
             if (err) {
                 result(err, null);
             }

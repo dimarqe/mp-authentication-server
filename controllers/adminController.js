@@ -44,16 +44,16 @@ const adminController = {
                                 var accessToken = jwt.sign({
                                     "role": "admin",
                                     "id": doc.admin_id
-                                }, process.env.ACCESS_TOKEN, { expiresIn: "15m" });
+                                }, process.env.ACCESS_TOKEN, { expiresIn: "30m" });
 
                                 //generate unique uuid for refresh token
-                                var tokenId = uuidv4().replace(/-/g, '');
+                                var tokenId = uuidv4();
 
                                 //creating refresh token
                                 var refreshToken = jwt.sign({
                                     "role": "admin",
                                     "id": doc.admin_id
-                                }, process.env.REFRESH_TOKEN, { expiresIn: "3d", jwtid: tokenId });
+                                }, process.env.REFRESH_TOKEN, { expiresIn: "1d", jwtid: tokenId });
                             } catch (error) {
                                 return next(error);
                             }
@@ -68,7 +68,7 @@ const adminController = {
                             });
 
                             //saving token object to database
-                            newToken.save((err, doc) => {
+                            TokenModel.save(newToken, (err, doc) => {
                                 if (err) {
                                     return next(err);
                                 }

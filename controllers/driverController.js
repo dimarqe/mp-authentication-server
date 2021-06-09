@@ -47,10 +47,10 @@ const driverController = {
                                 var accessToken = jwt.sign({
                                     "role": "driver",
                                     "id": doc.driver_id
-                                }, process.env.ACCESS_TOKEN, { expiresIn: "15m" });
+                                }, process.env.ACCESS_TOKEN, { expiresIn: "30m" });
 
                                 //generate unique uuid for refresh token
-                                let tokenId = uuidv4().replace(/-/g, '');
+                                let tokenId = uuidv4();
 
                                 //creating refresh token
                                 var refreshToken = jwt.sign({
@@ -71,7 +71,7 @@ const driverController = {
                             });
 
                             //saving token object to database
-                            newToken.save((err, doc) => {
+                            TokenModel.save(newToken, (err, doc) => {
                                 if (err) {
                                     return next(err);
                                 }

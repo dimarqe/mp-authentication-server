@@ -9,7 +9,7 @@ const tokenController = {
                 if(err){
                     return next(err);
                 }
-                else if (doc.affectedRows >= 1) {
+                else if (doc.rowCount >= 1) {
                     return res.status(200).json({
                         "error": false,
                         "message": "User successfully logged out",
@@ -45,7 +45,7 @@ const tokenController = {
                         var accessToken = jwt.sign({
                             "role": req.user.role,
                             "id": req.user.id
-                        }, process.env.ACCESS_TOKEN, { expiresIn: "15m" });
+                        }, process.env.ACCESS_TOKEN, { expiresIn: "30m" });
                     } catch (error) {
                         return next(error);
                     }

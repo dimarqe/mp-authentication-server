@@ -45,10 +45,10 @@ const studentController = {
                                 var accessToken = jwt.sign({
                                     "role": "student",
                                     "id": doc.student_id
-                                }, process.env.ACCESS_TOKEN, { expiresIn: "15m" });
+                                }, process.env.ACCESS_TOKEN, { expiresIn: "30m" });
 
                                 //generate unique uuid for refresh token
-                                var tokenId = uuidv4().replace(/-/g, '');
+                                var tokenId = uuidv4();
 
                                 //creating refresh token
                                 var refreshToken = jwt.sign({
@@ -69,12 +69,12 @@ const studentController = {
                             });
 
                             //saving token object to database
-                            newToken.save((err, doc) => {
+                            TokenModel.save(newToken, (err, doc) => {
                                 if (err) {
                                     return next(err);
                                 }
                                 else{
-                                    //removing password from retrieved driver object
+                                    //removing password from retrieved student object
                                     student.access_code = undefined;
 
                                     return res.status(200).json({
