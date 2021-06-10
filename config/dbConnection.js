@@ -2,10 +2,10 @@ const Pool = require('pg').Pool;
 
 //local testing db connection
 const pool = new Pool({
-    user: 'durrdyuvjgivpw',
-    host: 'ec2-3-233-7-12.compute-1.amazonaws.com',
-    database: 'df6k95m815ln3d',
-    password: 'd8bd636878a2a404b668f84ea3052fbbe27f83330d672e19dff33aa5077d919d',
+    user: process.env.USER,
+    host: process.env.HOST,
+    database: process.env.DATABASE,
+    password: process.env.PASSWORD,
     port: 5432,
     ssl:{
         rejectUnauthorized: false
