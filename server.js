@@ -15,6 +15,7 @@ const port = process.env.PORT || 5000;
 //Base connection route
 app.get('/', (req, res, next) => {
     return res.status(200).json({
+        "error":false,
         "message": "...Welcome",
         "data": null
     });
