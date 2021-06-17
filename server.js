@@ -1,16 +1,24 @@
 //Module imports
 const dotenv = require('dotenv').config({ path: './config/.env' });
+const cors = require('cors');
 const express = require('express');
 
 //Route imports
 const studentRoute = require('./routes/studentRoute');
 const adminRoute = require('./routes/adminRoute');
 const driverRoute = require('./routes/driverRoute');
-const tokeRoute = require('./routes/tokenRoute');
+const tokenRoute = require('./routes/tokenRoute');
 
 //App and port initialization
 const app = express();
 const port = process.env.PORT || 5000;
+
+
+//express request body parser middleware
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
+app.use(cors());
+
 
 //Base connection route
 app.get('/', (req, res, next) => {
@@ -21,17 +29,11 @@ app.get('/', (req, res, next) => {
     });
 });
 
-//express request body parser middleware
-app.use(express.json());
-app.use(express.urlencoded({extended:true}));
-
-
 //include imported routes
 app.use(studentRoute);
 app.use(adminRoute);
 app.use(driverRoute);
-app.use(tokeRoute);
-
+app.use(tokenRoute);
 
 //middleware that catches and returns an error for all undefined routes
 app.use('*', (req, res, next) => {
@@ -56,7 +58,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(port, () => {
-    console.log("Just touch down on " + port);
+    console.log("Just touched down on " + port);
 });
 
 
