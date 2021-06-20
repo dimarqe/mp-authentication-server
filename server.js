@@ -29,6 +29,14 @@ app.get('/', (req, res, next) => {
     });
 });
 
+app.post('/test', (req, res, next) => {
+    return res.status(200).json({
+        "error":false,
+        "message": req.body,
+        "data": null
+    });
+});
+
 //include imported routes
 app.use(studentRoute);
 app.use(adminRoute);
